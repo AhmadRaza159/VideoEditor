@@ -14,8 +14,29 @@ class EditorActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         videoLink=intent.getStringExtra("link")
-
         binding.videoView.setVideoPath(videoLink)
         binding.videoView.start()
+
+        btnClickListeners()
+        factory()
+    }
+
+    private fun factory() {
+        binding.videoView.setOnCompletionListener {
+            binding.videoPlayPauseTogler.setImageDrawable(resources.getDrawable(R.drawable.ic_round_play_arrow_24))
+        }
+    }
+
+    private fun btnClickListeners() {
+        binding.videoPlayPauseTogler.setOnClickListener {
+            if (binding.videoView.isPlaying){
+                binding.videoView.pause()
+                binding.videoPlayPauseTogler.setImageDrawable(resources.getDrawable(R.drawable.ic_round_play_arrow_24))
+            }
+            else{
+                binding.videoView.start()
+                binding.videoPlayPauseTogler.setImageDrawable(resources.getDrawable(R.drawable.ic_round_pause_24))
+            }
+        }
     }
 }
