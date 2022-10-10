@@ -1,4 +1,4 @@
-package h.k.videoeditor.ui.activities
+package h.k.videoeditor.ui.activities.ui.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 //            val videoPath = data?.data?.let { PathUtil.getPath(requireContext(), it) }
             val videoPath = data?.data
             Log.e("mymypath", videoPath.toString())
-            startActivity(Intent(this,EditorActivity::class.java).putExtra("link",data?.data.toString()))
+            startActivity(Intent(this, EditorActivity::class.java).putExtra("link",data?.data.toString()))
 
         }
     }

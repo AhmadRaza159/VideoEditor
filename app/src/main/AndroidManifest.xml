@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="h.k.videoeditor">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
@@ -10,10 +9,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VideoEditor">
         <activity
-            android:name=".ui.activities.EditorActivity"
+            android:name=".ui.activities.ui.activities.EditorActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activities.SplashActivity"
+            android:name=".ui.activities.ui.activities.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.MainActivity"
+            android:name=".ui.activities.ui.activities.MainActivity"
             android:exported="false" />
     </application>
 
