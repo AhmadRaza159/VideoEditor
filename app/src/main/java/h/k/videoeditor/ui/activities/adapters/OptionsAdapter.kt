@@ -32,58 +32,92 @@ class OptionsAdapter(
         when(myList[position]){
             EditOptions.CANVAS->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Canvas"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_canvas))
             }
             EditOptions.AUDIO->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Audio"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_audio))
             }
             EditOptions.SPEED->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Speed"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_speed))
             }
             EditOptions.VOLUME->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Volume"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_volume))
             }
             EditOptions.ROTATION->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Rotation"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_rotation))
             }
             EditOptions.FILTER->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Filter"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_filter))
             }
             EditOptions.CUT->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Cut"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_cut))
             }
             EditOptions.CROP->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Crop"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_crop))
             }
             EditOptions.SPLIT->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Split"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_split))
             }
             EditOptions.REPLACE->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Replace"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_exchange))
             }
             EditOptions.DUPLICATE->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Duplicate"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_duplicate))
             }
             EditOptions.FREEZ->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Freez"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_freez))
             }
             EditOptions.TEXT->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Text"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_text))
             }
             EditOptions.STICKER->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Sticker"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_sticker))
             }
             EditOptions.HISTORY->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "History"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_history))
             }
             EditOptions.UNDO->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Undo"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_undo))
             }
             EditOptions.REDO->{
                 holder.itemView.findViewById<TextView>(R.id.textView).text = "Redo"
+                holder.itemView.findViewById<ImageView>(R.id.option_image)
+                    .setImageDrawable(cntx.resources.getDrawable(R.drawable.png_undo))
+                holder.itemView.findViewById<ImageView>(R.id.option_image).rotation=180f
             }
         }
-            holder.itemView.findViewById<ImageView>(R.id.imageView).setImageDrawable(cntx.resources
-                .getDrawable(R.drawable.ic_launcher_background))
+
             holder.itemView.setOnClickListener {
                 clickInterface.onClick(myList[position])
             }
