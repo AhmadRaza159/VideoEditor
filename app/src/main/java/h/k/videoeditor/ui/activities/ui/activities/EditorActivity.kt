@@ -1,6 +1,7 @@
 package h.k.videoeditor.ui.activities.ui.activities
 
 import VideoHandle.EpEditor
+import VideoHandle.EpVideo
 import VideoHandle.OnEditorListener
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -15,10 +16,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.view.Window
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -30,13 +33,18 @@ import h.k.videoeditor.databinding.ActivityEditorBinding
 import h.k.videoeditor.ui.activities.adapters.OptionsAdapter
 import h.k.videoeditor.ui.activities.business_logic.EditOptions
 import h.k.videoeditor.ui.activities.business_logic.PathUtil
+import h.k.videoeditor.ui.activities.business_logic.Utils
 import h.k.videoeditor.ui.activities.interfaces.OptionClickInterface
 import java.io.File
 import java.util.UUID
 
 class EditorActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityEditorBinding
-    private var videoLink: String? = null
+
+    companion object{
+        var videoLink: String? = null
+        @SuppressLint("StaticFieldLeak")
+        lateinit var binding: ActivityEditorBinding
+    }
     lateinit var handler: Handler
     val GALLERY_REQUEST_CODE=12
     lateinit var alert: Dialog
@@ -117,19 +125,95 @@ class EditorActivity : AppCompatActivity() {
                             )
                         }
                         EditOptions.SPEED->{
+                            val alert = Dialog(this@EditorActivity)
+                            val customLayout: View =
+                                layoutInflater.inflate(R.layout.dailog_audio_opts, null)
+                            alert.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                            alert.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                            alert.setCancelable(true)
+                            alert.setCanceledOnTouchOutside(true)
+                            alert.setContentView(customLayout)
+
+                            val btnSlow=customLayout.findViewById<ConstraintLayout>(R.id.btn_slow)
+                            val btnFast=customLayout.findViewById<ConstraintLayout>(R.id.btn_fast)
+
+                            btnSlow.setOnClickListener {
+                                alert.dismiss()
+                                Utils.slowMoLab(File(videoLink),this@EditorActivity)
+                            }
+
+                            btnFast.setOnClickListener {
+                                alert.dismiss()
+                                Utils.timeLapsLab(File(videoLink),this@EditorActivity)
+
+                            }
+
+                            alert.show()
 
                         }
                         EditOptions.VOLUME->{
+                            val alert = Dialog(this@EditorActivity)
+                            val customLayout: View =
+                                layoutInflater.inflate(R.layout.dailog_volume, null)
+                            alert.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                            alert.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                            alert.setCancelable(true)
+                            alert.setCanceledOnTouchOutside(true)
+                            alert.setContentView(customLayout)
 
+                            val btnVolDown=customLayout.findViewById<ConstraintLayout>(R.id.btn_vol_down)
+                            val btnVolUp=customLayout.findViewById<ConstraintLayout>(R.id.btn_vol_up)
+
+                            btnVolDown.setOnClickListener {
+                                alert.dismiss()
+                                Utils.volDownMoLab(File(videoLink),this@EditorActivity)
+                            }
+
+                            btnVolUp.setOnClickListener {
+                                alert.dismiss()
+                                Utils.volUpMoLab(File(videoLink),this@EditorActivity)
+
+                            }
+
+                            alert.show()
                         }
                         EditOptions.ROTATION->{
-
+                            Utils.rotationMoLab(File(videoLink),this@EditorActivity)
                         }
                         EditOptions.FILTER->{
 
                         }
                         EditOptions.CUT->{
-                           }
+                            val alert = Dialog(this@EditorActivity)
+                            val customLayout: View =
+                                layoutInflater.inflate(R.layout.dailog_cutting, null)
+                            alert.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                            alert.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                            alert.setCancelable(true)
+                            alert.setCanceledOnTouchOutside(true)
+                            alert.setContentView(customLayout)
+
+                            val btnCut=customLayout.findViewById<ConstraintLayout>(R.id.btn_cut)
+                            val txtStart=customLayout.findViewById<EditText>(R.id.editText)
+                            val txtDuration=customLayout.findViewById<EditText>(R.id.editText1)
+
+                            btnCut.setOnClickListener {
+                                if (txtStart.text.toString().isNotEmpty()&&
+                                    txtDuration.text.toString().isNotEmpty()){
+                                    alert.dismiss()
+                                    Utils.cuttingMoLab(
+                                        txtStart.text.toString().toFloat(),
+                                        txtDuration.text.toString().toFloat(),
+                                        File(videoLink),this@EditorActivity)
+                                }
+
+
+                            }
+
+                            alert.show()
+
+
+                        }
                         EditOptions.CROP->{
                           }
                         EditOptions.SPLIT->{
