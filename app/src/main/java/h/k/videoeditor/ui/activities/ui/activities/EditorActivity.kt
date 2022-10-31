@@ -12,11 +12,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.*
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
@@ -25,6 +22,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,6 +34,8 @@ import h.k.videoeditor.ui.activities.business_logic.PathUtil
 import h.k.videoeditor.ui.activities.business_logic.Utils
 import h.k.videoeditor.ui.activities.interfaces.OptionClickInterface
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.UUID
 
 class EditorActivity : AppCompatActivity() {
@@ -45,30 +45,32 @@ class EditorActivity : AppCompatActivity() {
         @SuppressLint("StaticFieldLeak")
         lateinit var binding: ActivityEditorBinding
     }
+    private var isDelete=true
     lateinit var handler: Handler
     val GALLERY_REQUEST_CODE=12
     lateinit var alert: Dialog
+    private val CROPPING_CODE=332
     private var arrayData = arrayListOf<Int>(
         EditOptions.CANVAS,
         EditOptions.AUDIO,
         EditOptions.SPEED,
         EditOptions.VOLUME,
         EditOptions.ROTATION,
-        EditOptions.FILTER,
         EditOptions.CUT,
         EditOptions.CROP,
         EditOptions.SPLIT,
         EditOptions.REPLACE,
-        EditOptions.DUPLICATE,
-        EditOptions.FREEZ,
-        EditOptions.TEXT,
-        EditOptions.STICKER,
-        EditOptions.HISTORY,
-        EditOptions.UNDO,
-        EditOptions.REDO
+        EditOptions.DUPLICATE
 
     )
 
+    override fun onBackPressed() {
+        if (isDelete){
+            File(videoLink).delete()
+        }
+        super.onBackPressed()
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEditorBinding.inflate(layoutInflater)
@@ -80,6 +82,14 @@ class EditorActivity : AppCompatActivity() {
 
         btnClickListeners()
         factory()
+        binding.btnMenu.setOnClickListener{
+            onBackPressed()
+        }
+        binding.btnSave.setOnClickListener {
+            isDelete=false
+            Toast.makeText(this,"File saved at ${videoLink}",Toast.LENGTH_SHORT).show()
+            onBackPressed()
+        }
     }
 
     private fun factory() {
@@ -115,7 +125,12 @@ class EditorActivity : AppCompatActivity() {
                 override fun onClick(model: Int) {
                     when(model){
                         EditOptions.CANVAS->{
-
+                            val intent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI)
+                            intent.type = "video/*"
+                            startActivityForResult(
+                                intent,
+                                235
+                            )
                         }
                         EditOptions.AUDIO->{
                             val intent = Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
@@ -179,10 +194,9 @@ class EditorActivity : AppCompatActivity() {
                         }
                         EditOptions.ROTATION->{
                             Utils.rotationMoLab(File(videoLink),this@EditorActivity)
-                        }
-                        EditOptions.FILTER->{
 
                         }
+
                         EditOptions.CUT->{
                             val alert = Dialog(this@EditorActivity)
                             val customLayout: View =
@@ -206,8 +220,6 @@ class EditorActivity : AppCompatActivity() {
                                         txtDuration.text.toString().toFloat(),
                                         File(videoLink),this@EditorActivity)
                                 }
-
-
                             }
 
                             alert.show()
@@ -215,25 +227,25 @@ class EditorActivity : AppCompatActivity() {
 
                         }
                         EditOptions.CROP->{
+                            startActivityForResult(Intent(this@EditorActivity,CropActivity::class.java).putExtra("link",
+                                videoLink),CROPPING_CODE)
                           }
                         EditOptions.SPLIT->{
+
+                            Utils.splitttingMoLab(File(videoLink),this@EditorActivity,binding.videoView.duration)
                           }
                         EditOptions.REPLACE->{
+                            val intent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI)
+                            intent.type = "video/*"
+                            startActivityForResult(
+                                intent,
+                                236
+                            )
                           }
                         EditOptions.DUPLICATE->{
+                            Utils.mergeTwoFiles(File(videoLink),File(videoLink),this@EditorActivity)
                           }
-                        EditOptions.FREEZ->{
-                          }
-                        EditOptions.TEXT->{
-                          }
-                        EditOptions.STICKER->{
-                          }
-                        EditOptions.HISTORY->{
-                          }
-                        EditOptions.UNDO->{
-                          }
-                        EditOptions.REDO->{
-                          }
+
                     }
 
                     Toast.makeText(this@EditorActivity, model.toString(), Toast.LENGTH_SHORT).show()
@@ -268,6 +280,7 @@ class EditorActivity : AppCompatActivity() {
         } else null
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -326,6 +339,38 @@ class EditorActivity : AppCompatActivity() {
 
 
 
+
+        }
+        if (resultCode == RESULT_OK && requestCode == CROPPING_CODE){
+            Log.d("logkey",data?.getIntExtra("w",0).toString())
+            Log.d("logkey",data?.getIntExtra("h",0).toString())
+            Log.d("logkey",data?.getIntExtra("x",0).toString())
+            Log.d("logkey",data?.getIntExtra("y",0).toString())
+            Utils.cropingMoLab(data?.getIntExtra("w",0)?.toFloat(),
+                data?.getIntExtra("h",0)?.toFloat(),
+                data?.getIntExtra("x",0)?.toFloat(),
+                data?.getIntExtra("y",0)?.toFloat(),
+                File(videoLink),this@EditorActivity)
+
+        }
+        if (resultCode == RESULT_OK && requestCode == 235){
+            val source= data?.data?.let { PathUtil.getPath(this, it) }
+            Utils.mergeTwoFiles(File(videoLink),File(source),this@EditorActivity)
+
+        }
+
+        if (resultCode == RESULT_OK && requestCode == 236){
+            val source= data?.data?.let { PathUtil.getPath(this, it) }
+            File(videoLink).delete()
+            var resultPath=
+                File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),"VideoEditor")
+            if (!resultPath.exists())
+                resultPath.mkdir()
+            resultPath= File(resultPath, UUID.randomUUID().toString()+"audio.mp4")
+            Files.copy(File(source).toPath(),resultPath.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            videoLink=resultPath.absolutePath
+            binding.videoView.setVideoPath(videoLink)
+            binding.videoView.start()
 
         }
     }

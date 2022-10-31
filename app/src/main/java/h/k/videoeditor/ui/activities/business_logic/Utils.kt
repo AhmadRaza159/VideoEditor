@@ -377,6 +377,223 @@ class Utils {
 
 
         }
+        fun cropingMoLab(widthV:Float?,heightV:Float?,xV:Float?,yV:Float?,path: File, cntxt: Activity)
+        {
+            /////
+            val parentDest = path
+
+            val epVideo=EpVideo(videoLink)
+            if (widthV != null&&
+                heightV != null&&
+                xV != null&&
+                yV != null) {
+                epVideo.crop(widthV,heightV,xV,yV)
+            }
+            var childDest = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
+                "VideoEditor"
+            )
+            if (!childDest.exists())
+                childDest.mkdir()
+            childDest = File(childDest, UUID.randomUUID().toString() + "_crop.mp4")
+            val outPutOptions=EpEditor.OutputOption(childDest.absolutePath)
+            alert = Dialog(cntxt)
+            val customLayout: View =
+                cntxt.layoutInflater.inflate(R.layout.dailog_processing, null)
+            alert.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            alert.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            alert.setCancelable(false)
+            alert.setCanceledOnTouchOutside(false)
+            alert.setContentView(customLayout)
+            val processing: TextView = customLayout.findViewById<TextView>(R.id.process)
+            alert.show()
+
+            EpEditor.exec(epVideo,outPutOptions,object:OnEditorListener{
+                override fun onSuccess() {
+                    Log.d("logkey","Success")
+
+                    Handler(Looper.getMainLooper()).post {
+                        parentDest.delete()
+                        videoLink = childDest.absolutePath
+                        alert.dismiss()
+                        binding.videoView.setVideoPath(videoLink)
+                        binding.videoView.start()
+                    }
+
+                    path.delete()
+                }
+
+                override fun onFailure() {
+                    Log.d("logkey","Failed")
+                    Handler(Looper.getMainLooper()).post {
+                        alert.dismiss()
+                        childDest.delete()
+                    }
+                }
+
+                override fun onProgress(progress: Float) {
+                    Log.d("logkey","Processing: ${String.format("%.2f", progress)}%")
+                    Handler(Looper.getMainLooper()).post {
+                        processing.text = "Processing: ${String.format("%.2f", progress)}%"
+                    }
+                }
+            })
+
+            ////
+
+
+        }
+        fun splitttingMoLab(path: File, cntxt: Activity,duration:Int) {
+            /////
+            val parentDest = path
+
+            val actualDurtion=(duration/1000).toFloat()
+            val epVideo=EpVideo(videoLink)
+            Log.d("logkey",(duration).toString())
+            epVideo.clip(0f,actualDurtion/2)
+            val epVideo2=EpVideo(videoLink)
+            epVideo2.clip(actualDurtion/2,actualDurtion)
+            var childDest = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
+                "VideoEditor"
+            )
+            if (!childDest.exists())
+                childDest.mkdir()
+            val childDest1 = File(childDest, UUID.randomUUID().toString() + "_split1.mp4")
+            val childDest2 = File(childDest, UUID.randomUUID().toString() + "_split2.mp4")
+            val outPutOptions=EpEditor.OutputOption(childDest1.absolutePath)
+            val outPutOptions2=EpEditor.OutputOption(childDest2.absolutePath)
+            alert = Dialog(cntxt)
+            val customLayout: View =
+                cntxt.layoutInflater.inflate(R.layout.dailog_processing, null)
+            alert.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            alert.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            alert.setCancelable(false)
+            alert.setCanceledOnTouchOutside(false)
+            alert.setContentView(customLayout)
+            val processing: TextView = customLayout.findViewById<TextView>(R.id.process)
+            alert.show()
+
+            EpEditor.exec(epVideo,outPutOptions,object:OnEditorListener{
+                override fun onSuccess() {
+                    Log.d("logkey","Success")
+                    Handler(Looper.getMainLooper()).post {
+                        EpEditor.exec(epVideo2,outPutOptions2,object:OnEditorListener{
+                            override fun onSuccess() {
+                                Log.d("logkey","Success")
+
+                                Handler(Looper.getMainLooper()).post {
+                                    Toast.makeText(
+                                        cntxt,
+                                        "Both Files saved at ${File(
+                                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
+                                            "VideoEditor"
+                                        )}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    parentDest.delete()
+                                    videoLink = childDest2.absolutePath
+                                    alert.dismiss()
+                                    binding.videoView.setVideoPath(videoLink)
+                                    binding.videoView.start()
+                                }
+
+                                path.delete()
+                            }
+
+                            override fun onFailure() {
+                                Log.d("logkey","Failed")
+                                Handler(Looper.getMainLooper()).post {
+                                    alert.dismiss()
+                                    childDest2.delete()
+                                }
+                            }
+
+                            override fun onProgress(progress: Float) {
+                                Log.d("logkey","Processing: ${String.format("%.2f", progress)}%")
+                                Handler(Looper.getMainLooper()).post {
+                                    processing.text = "Processing: ${String.format("%.2f", progress)}%"
+                                }
+                            }
+                        })
+
+                    }
+                }
+
+                override fun onFailure() {
+                    Log.d("logkey","Failed")
+                    Handler(Looper.getMainLooper()).post {
+                        alert.dismiss()
+                        childDest1.delete()
+                    }
+                }
+
+                override fun onProgress(progress: Float) {
+                    Log.d("logkey","Processing: ${String.format("%.2f", progress)}%")
+                    Handler(Looper.getMainLooper()).post {
+                        processing.text = "Processing: ${String.format("%.2f", progress/2)}%"
+                    }
+                }
+            })
+
+            ////
+        }
+
+
+        fun mergeTwoFiles(path1:File,path2:File,cntxt:Activity){
+            val epvid1=EpVideo(path1.absolutePath)
+            val epvid2=EpVideo(path2.absolutePath)
+
+            val lst= mutableListOf<EpVideo>(epvid1,epvid2)
+
+            var childDest = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
+                "VideoEditor"
+            )
+            if (!childDest.exists())
+                childDest.mkdir()
+            childDest = File(childDest, UUID.randomUUID().toString() + "_split1.mp4")
+            val outPutOptions=EpEditor.OutputOption(childDest.absolutePath)
+            alert = Dialog(cntxt)
+            val customLayout: View =
+                cntxt.layoutInflater.inflate(R.layout.dailog_processing, null)
+            alert.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            alert.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            alert.setCancelable(false)
+            alert.setCanceledOnTouchOutside(false)
+            alert.setContentView(customLayout)
+            val processing: TextView = customLayout.findViewById<TextView>(R.id.process)
+            alert.show()
+
+            EpEditor.merge(lst,outPutOptions,object :OnEditorListener{
+                override fun onSuccess() {
+                    Log.d("logkey","Success")
+
+                    Handler(Looper.getMainLooper()).post {
+                        videoLink = childDest.absolutePath
+                        alert.dismiss()
+                        binding.videoView.setVideoPath(videoLink)
+                        binding.videoView.start()
+                    }
+
+                }
+
+                override fun onFailure() {
+                    Log.d("logkey","Failed")
+                    Handler(Looper.getMainLooper()).post {
+                        alert.dismiss()
+                        childDest.delete()
+                    }
+                }
+
+                override fun onProgress(progress: Float) {
+                    Log.d("logkey","Processing: ${String.format("%.2f", progress)}%")
+                    Handler(Looper.getMainLooper()).post {
+                        processing.text = "Processing: ${String.format("%.2f", progress)}%"
+                    }
+                }
+            })
+        }
 
     }
 }
