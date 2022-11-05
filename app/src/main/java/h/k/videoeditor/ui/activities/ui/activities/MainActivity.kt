@@ -14,10 +14,13 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import h.k.videoeditor.R
@@ -81,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         alert.setCanceledOnTouchOutside(true)
         val yesBtn: TextView = customLayout.findViewById(R.id.btn_yes)
         val noBtn: TextView = customLayout.findViewById(R.id.btn_no)
+        val rateBtn: TextView = customLayout.findViewById(R.id.rate_us)
 
         noBtn.setOnClickListener {
             alert.dismiss()
@@ -89,8 +93,144 @@ class MainActivity : AppCompatActivity() {
             finishAffinity()
         }
 
+        rateBtn.setOnClickListener{
+            alert.dismiss()
+            openRateD()
+        }
+
         alert.show()
     }
+
+    private fun openRateD() {
+        var counter=0
+        val alertDialog = AlertDialog.Builder(this)
+        val customLayout: View = getLayoutInflater().inflate(R.layout.dalog_rate, null)
+        alertDialog.setView(customLayout)
+        val alert = alertDialog.create()
+        alert.window?.setBackgroundDrawableResource(android.R.color.transparent);
+        alert.setCancelable(false)
+        alert.setCanceledOnTouchOutside(true)
+        val rateBtn: TextView = customLayout.findViewById(R.id.btn_rate)
+        val cancelBtn: TextView = customLayout.findViewById(R.id.btn_cancel)
+
+        val star1 = customLayout.findViewById<ImageView>(R.id.star1)
+        val star2 = customLayout.findViewById<ImageView>(R.id.star2)
+        val star3 = customLayout.findViewById<ImageView>(R.id.star3)
+        val star4 = customLayout.findViewById<ImageView>(R.id.star4)
+        val star5 = customLayout.findViewById<ImageView>(R.id.star5)
+
+        star1.setOnClickListener {
+            counter=0
+            star1.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star2.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+            star3.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+            star4.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+            star5.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+        }
+        star2.setOnClickListener {
+            counter=0
+            star1.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star2.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star3.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+            star4.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+            star5.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+        }
+        star3.setOnClickListener {
+            counter=0
+            star1.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star2.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star3.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star4.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+            star5.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+        }
+        star4.setOnClickListener {
+            counter=1
+            star1.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star2.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star3.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star4.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star5.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_fill,theme))
+        }
+        star5.setOnClickListener {
+            counter=1
+            star1.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star2.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star3.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star4.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+            star5.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.star_unfill,theme))
+        }
+
+        rateBtn.setOnClickListener {
+            alert.dismiss()
+            if (counter==1){
+                val uri = Uri.parse("market://details?id=" + applicationContext.packageName)
+                val goToMarket = Intent(Intent.ACTION_VIEW, uri)
+
+                goToMarket.addFlags(
+                    Intent.FLAG_ACTIVITY_NO_HISTORY or
+                            Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+                            Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+                )
+                try {
+                    startActivity(goToMarket)
+                } catch (e: ActivityNotFoundException) {
+                    startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.packageName)
+                        )
+                    )
+                }
+            }
+            else{
+                val alertDialog2 = AlertDialog.Builder(this)
+                val customLayout2: View = getLayoutInflater().inflate(R.layout.dalog_feedback, null)
+                alertDialog2.setView(customLayout2)
+                val alert2 = alertDialog2.create()
+                alert2.window?.setBackgroundDrawableResource(android.R.color.transparent);
+                alert2.setCancelable(false)
+                alert2.setCanceledOnTouchOutside(true)
+                val feedbackBtn: TextView = customLayout2.findViewById(R.id.btn_feedback)
+                val cancelBtn: TextView = customLayout2.findViewById(R.id.btn_cancel)
+
+                cancelBtn.setOnClickListener {
+                    alert2.dismiss()
+                }
+                feedbackBtn.setOnClickListener {
+                    alert2.dismiss()
+                    val i = Intent(Intent.ACTION_SEND)
+                    i.type = "message/rfc822"
+                    i.putExtra(Intent.EXTRA_EMAIL, arrayOf("dotsoftprogames@gmail.com"))
+                    i.putExtra(
+                        Intent.EXTRA_TEXT,
+                        "Type your message here..."
+                    )
+                    i.putExtra(Intent.EXTRA_SUBJECT, "Video Editor Feedback")
+                    i.setPackage("com.google.android.gm")
+
+                    try {
+                        startActivity(Intent.createChooser(i, "Send mail..."))
+                        alert.dismiss()
+                    } catch (ex: ActivityNotFoundException) {
+                        Toast.makeText(
+                            this,
+                            "Some error occurred in sending email.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                alert2.show()
+            }
+        }
+        cancelBtn.setOnClickListener {
+            alert.dismiss()
+        }
+
+        alert.show()
+
+    }
+
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -183,7 +323,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.more_apps -> {
                         val uri =
-                            Uri.parse("https://play.google.com/store/apps/developer?id=Westminster+Pro+Apps")
+                            Uri.parse("https://play.google.com/store/apps/developer?id=DotSoft+Pro+Games")
                         val goToMarket = Intent(Intent.ACTION_VIEW, uri)
                         // To count with Play market backstack, After pressing back button,
                         // to taken back to our application, we need to add following flags to intent.
@@ -200,7 +340,7 @@ class MainActivity : AppCompatActivity() {
                             startActivity(
                                 Intent(
                                     Intent.ACTION_VIEW,
-                                    Uri.parse("https://play.google.com/store/apps/developer?id=Westminster+Pro+Apps")
+                                    Uri.parse("https://play.google.com/store/apps/developer?id=DotSoft+Pro+Games")
                                 )
                             )
                         }
@@ -220,29 +360,12 @@ class MainActivity : AppCompatActivity() {
                         true
                     }
                     R.id.rate -> {
-                        val uri = Uri.parse("market://details?id=" + applicationContext.packageName)
-                        val goToMarket = Intent(Intent.ACTION_VIEW, uri)
-
-                        goToMarket.addFlags(
-                            Intent.FLAG_ACTIVITY_NO_HISTORY or
-                                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
-                                    Intent.FLAG_ACTIVITY_MULTIPLE_TASK
-                        )
-                        try {
-                            startActivity(goToMarket)
-                        } catch (e: ActivityNotFoundException) {
-                            startActivity(
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("http://play.google.com/store/apps/details?id=" + applicationContext.packageName)
-                                )
-                            )
-                        }
+                        openRateD()
                         binding.drawerLayout.closeDrawers()
                         true
                     }
                     R.id.policy -> {
-                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com"))
+                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://dotsoftprogames555.blogspot.com/2022/03/privacy-policy.html"))
                         startActivity(browserIntent)
                         true
                     }

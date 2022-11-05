@@ -7,7 +7,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "h.k.videoeditor"
+        applicationId "com.video.editor.videomaker.photo.editor.infotech"
         minSdk 21
         targetSdk 33
         versionCode 1
